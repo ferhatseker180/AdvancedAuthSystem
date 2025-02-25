@@ -1,7 +1,9 @@
 package org.ferhat.advanced_auth_system.core.config.security;
 
 import org.ferhat.advanced_auth_system.repository.UserRepository;
+import org.ferhat.advanced_auth_system.security.JwtTokenFilter;
 import org.ferhat.advanced_auth_system.security.JwtTokenProvider;
+import org.ferhat.advanced_auth_system.security.UserSecurity;
 import org.ferhat.advanced_auth_system.service.auth.AuthService;
 import org.ferhat.advanced_auth_system.service.user.CustomUserDetailsServiceImpl;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,11 +32,13 @@ import java.util.Arrays;
 public class SecurityConfiguration {
 
     private JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
-    public SecurityConfiguration(JwtTokenProvider jwtTokenProvider) {
+    public SecurityConfiguration(JwtTokenProvider jwtTokenProvider, UserRepository userRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userRepository = userRepository;
     }
 
     @Bean
@@ -45,7 +50,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -58,15 +63,11 @@ public class SecurityConfiguration {
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/verify",
-                                "api/v1/auth/resend-verification",
-                                "api/v1/users/delete/",
-                                "api/v1/users",
-                                "api/v1/users/",
-                                "api/v1/users/email/",
-                                "api/v1/users/add-role"
+                                "/api/v1/auth/resend-verification"
                         ).permitAll()
                         .anyRequest().authenticated()
-                );
+                ).addFilterBefore(new JwtTokenFilter(jwtTokenProvider, userRepository),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -102,5 +103,10 @@ public class SecurityConfiguration {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return new CustomUserDetailsServiceImpl(userRepository);
+    }
+
+    @Bean
+    public UserSecurity userSecurity(UserRepository userRepository) {
+        return new UserSecurity(userRepository);
     }
 }

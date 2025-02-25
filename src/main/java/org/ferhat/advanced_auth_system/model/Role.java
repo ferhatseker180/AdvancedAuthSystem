@@ -66,7 +66,7 @@ public class Role {
     }
 
     public enum ERole {
-        USER,        // Standard User
-        ADMIN       // Full Authorization
+        ROLE_USER,        // Standard User
+        ROLE_ADMIN       // Full Authorization
     }
 }

@@ -22,14 +22,14 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/{id}")
-     @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
     public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
         ApiResponse<UserResponse> response = userService.getUserById(id);
         return ResponseEntity.status(response.getStatusCode()).body(response);

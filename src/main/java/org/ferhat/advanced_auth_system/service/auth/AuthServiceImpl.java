@@ -133,7 +133,7 @@ public class AuthServiceImpl implements AuthService{
             Role role;
             if (signUpRequest.getRoleId() == null) {
                 //  If roleId is null, the USER role is assigned by default
-                role = roleRepository.findByName(Role.ERole.USER)
+                role = roleRepository.findByName(Role.ERole.ROLE_USER)
                         .orElseThrow(() -> new IllegalStateException(ApiMessage.USER_NOT_FOUND.getMessage()));
             } else {
                 // Find role with sent ID
