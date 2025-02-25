@@ -29,7 +29,7 @@ public class SignUpRequest {
     @NotBlank(message = "Lastname can't be empty")
     private String lastName;
 
-    private Set<String> roles;
+    private Long roleId;
 
     public @NotBlank(message = "Email can'be empty!!") @Email(message = "Enter a valid email address") String getEmail() {
         return email;
@@ -63,11 +63,11 @@ public class SignUpRequest {
         this.lastName = lastName;
     }
 
-    public Set<String> getRoles() {
-        return roles;
+    public Long getRoleId() {
+        return roleId;
     }
 
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
     }
 }

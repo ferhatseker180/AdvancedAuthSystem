@@ -10,6 +10,7 @@ public interface AuthService {
     ApiResponse<JwtResponse> login(LoginRequest loginRequest);
     ApiResponse<String> register(SignUpRequest signUpRequest);
     ApiResponse<String> verifyEmail(String token);
+    ApiResponse<String> resendVerificationEmail(String email);
     ApiResponse<String> refreshToken(String refreshToken);
     void handleFailedLogin(User user);
     ApiResponse<JwtResponse> completeLogin(User user);

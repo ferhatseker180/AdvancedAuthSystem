@@ -4,6 +4,7 @@ import org.ferhat.advanced_auth_system.dto.request.PasswordResetRequest;
 import org.ferhat.advanced_auth_system.dto.request.UserUpdateRequest;
 import org.ferhat.advanced_auth_system.dto.response.ApiResponse;
 import org.ferhat.advanced_auth_system.dto.response.UserResponse;
+import org.ferhat.advanced_auth_system.model.Role;
 import org.ferhat.advanced_auth_system.model.User;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public interface UserService {
     ApiResponse<String> deleteUser(Long id);
     ApiResponse<List<UserResponse>> getAllUsers();
     UserResponse convertToUserResponse(User user);
+    Role addRole(String roleName, String description);
 }

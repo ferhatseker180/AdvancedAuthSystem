@@ -1,13 +1,9 @@
 package org.ferhat.advanced_auth_system.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "roles")
-@AllArgsConstructor
-@NoArgsConstructor
 public class Role {
 
     @Id
@@ -23,6 +19,14 @@ public class Role {
 
     @Column(nullable = false)
     private boolean isActive = true;
+
+    // Default constructor
+    public Role() {}
+
+        public Role(String name) {
+        this.name = ERole.valueOf(name);
+        this.description = name;
+    }
 
     public Long getId() {
         return id;
@@ -56,9 +60,13 @@ public class Role {
         isActive = active;
     }
 
+    @Override
+    public String toString() {
+        return "Role{name=" + name + ", description='" + description + "', isActive=" + isActive + "}";
+    }
+
     public enum ERole {
-        ROLE_USER,        // Standart kullanıcı
-        ROLE_ADMIN,       // Tam yetkili
-        ROLE_SUPPORT      // Destek personeli
+        USER,        // Standard User
+        ADMIN       // Full Authorization
     }
 }

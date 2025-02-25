@@ -1,10 +1,13 @@
 package org.ferhat.advanced_auth_system.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
 import java.util.Date;
 
 @Service
@@ -14,6 +17,11 @@ public class JwtTokenProvider {
 
     @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
+
+    @PostConstruct
+    protected void init() {
+        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+    }
 
     public String generateToken(String email) {
         return Jwts.builder()
@@ -34,10 +42,16 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
+        } catch (ExpiredJwtException e) {
+            System.out.println("The token has expired.");
         } catch (Exception e) {
-            return false;
+            System.out.println("Invalid token");
         }
+        return false;
     }
 }

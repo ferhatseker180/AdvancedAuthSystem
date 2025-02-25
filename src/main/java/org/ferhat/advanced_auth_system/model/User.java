@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.ferhat.advanced_auth_system.service.auth.AuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -19,6 +22,8 @@ import java.util.Set;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)  // Timestamp yönetimi için
 public class User {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,15 +49,15 @@ public class User {
     private int failedAttempt;
     private Date lockTime;
 
-    @CreatedDate  // Oluşturulma zamanı otomatik set edilir
+    @CreatedDate  // Creation time is set automatically
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate  // Son güncelleme zamanı otomatik set edilir
+    @LastModifiedDate  // Last update time is set automatically
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    // Son giriş zamanı
+    // Last entry time
     private LocalDateTime lastLoginAt;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -104,6 +109,7 @@ public class User {
     }
 
     public Set<Role> getRoles() {
+        log.info("Kullanıcının rollerini alıyorum: {}", roles);
         return roles;
     }
 
