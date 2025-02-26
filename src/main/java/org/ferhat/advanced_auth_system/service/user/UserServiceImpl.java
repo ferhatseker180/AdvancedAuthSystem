@@ -120,6 +120,8 @@ public class UserServiceImpl implements UserService {
                     ApiMessage.SUCCESS);
 
         } catch (Exception e) {
+            log.error("Error changing password: ID: {} Error: {}", id, e.getMessage());
+            e.printStackTrace();
             return ApiResponse.error(
                     ApiMessage.VALIDATION_ERROR,
                     HttpStatus.BAD_REQUEST.value());

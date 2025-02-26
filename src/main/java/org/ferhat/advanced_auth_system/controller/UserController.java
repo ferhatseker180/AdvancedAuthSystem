@@ -6,8 +6,6 @@ import org.ferhat.advanced_auth_system.dto.request.UserUpdateRequest;
 import org.ferhat.advanced_auth_system.dto.response.ApiResponse;
 import org.ferhat.advanced_auth_system.dto.response.UserResponse;
 import org.ferhat.advanced_auth_system.model.Role;
-import org.ferhat.advanced_auth_system.model.User;
-import org.ferhat.advanced_auth_system.service.auth.AuthService;
 import org.ferhat.advanced_auth_system.service.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,16 +54,19 @@ public class UserController {
     public ResponseEntity<ApiResponse<String>> changePassword(
             @PathVariable Long id,
             @Valid @RequestBody PasswordResetRequest request) {
+        log.info("Password change request received. User ID: {}", id);
         ApiResponse<String> response = userService.changePassword(id, request);
+        log.info("Password change is complete: ID = {} - Status Code: {}",
+                id, response.getStatusCode());
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteUser(@PathVariable Long id) {
-        log.info("DELETE isteği alındı. Kullanıcı silinecek: ID = {}", id);
+        log.info("DELETE request received. User will be deleted: ID = {}", id);
         ApiResponse<String> response = userService.deleteUser(id);
-        log.info("Kullanıcı silme işlemi tamamlandı: ID = {} - Sonuç: {}", id, response.getMessage());
+        log.info("User deletion completed: ID = {} - Result: {}", id, response.getMessage());
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 

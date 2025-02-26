@@ -1,6 +1,5 @@
 package org.ferhat.advanced_auth_system.security;
 
-import lombok.RequiredArgsConstructor;
 import org.ferhat.advanced_auth_system.model.User;
 import org.ferhat.advanced_auth_system.repository.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -27,25 +26,25 @@ public class UserSecurity {
         try {
             Authentication authentication = getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
-                System.out.println("Kimlik doğrulama yok veya kimlik doğrulanmadı");
+                System.out.println("No authentication or not authenticated");
                 return false;
             }
 
             Object principal = authentication.getPrincipal();
-            System.out.println("Principal sınıfı: " + (principal != null ? principal.getClass().getName() : "null"));
+            System.out.println("Principal class: " + (principal != null ? principal.getClass().getName() : "null"));
 
             if (principal instanceof UserDetails userDetails) {
                 String email = userDetails.getUsername();
-                System.out.println("Güvenlik bağlamından kullanıcı e-postası: " + email);
+                System.out.println("User email from a security context: " + email);
 
                 User user = userRepository.findByEmail(email).orElse(null);
-                System.out.println("Veritabanından kullanıcı: " + (user != null ? user.getId() : "bulunamadı"));
+                System.out.println("User from database: " + (user != null ? user.getId() : "not found"));
 
                 return user != null && user.getId().equals(userId);
             }
             return false;
         } catch (Exception e) {
-            System.err.println("isCurrentUser'da hata: " + e.getMessage());
+            System.err.println("Error in isCurrentUser: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
