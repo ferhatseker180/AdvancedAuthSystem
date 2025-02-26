@@ -78,11 +78,6 @@ public class UserServiceImpl implements UserService {
 
             modelMapperService.forRequest().map(userUpdateRequest, user);
 
-         //   user.setFirstName(userUpdateRequest.getFirstName());
-         //   user.setLastName(userUpdateRequest.getLastName());
-         //   user.setEmail(userUpdateRequest.getEmail());
-         //   user.setUsing2FA(userUpdateRequest.isUsing2FA());
-
             userRepository.save(user);
 
             return ApiResponse.success(
