@@ -29,7 +29,9 @@ public enum ApiMessage {
     TWO_FA_REQUIRED("Two-factor authentication required"),
     TWO_FA_INVALID("Invalid two-factor authentication code"),
     TWO_FA_ENABLED("Two-factor authentication enabled successfully"),
-    TWO_FA_DISABLED("Two-factor authentication disabled successfully");
+    TWO_FA_DISABLED("Two-factor authentication disabled successfully"),
+    INVALID_TWO_FA_CODE("Invalid 2FA code"),
+    GENERATED_QR_CODE("Generated QR code");
 
     private final String message;
 

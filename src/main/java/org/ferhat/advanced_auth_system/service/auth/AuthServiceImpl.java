@@ -4,6 +4,7 @@ import org.ferhat.advanced_auth_system.core.config.modelMapper.IModelMapperServi
 import org.ferhat.advanced_auth_system.core.utils.ApiMessage;
 import org.ferhat.advanced_auth_system.dto.request.LoginRequest;
 import org.ferhat.advanced_auth_system.dto.request.SignUpRequest;
+import org.ferhat.advanced_auth_system.dto.request.TwoFactorVerifyRequest;
 import org.ferhat.advanced_auth_system.dto.response.ApiResponse;
 import org.ferhat.advanced_auth_system.dto.response.JwtResponse;
 import org.ferhat.advanced_auth_system.model.Role;
@@ -12,6 +13,7 @@ import org.ferhat.advanced_auth_system.repository.RoleRepository;
 import org.ferhat.advanced_auth_system.repository.UserRepository;
 import org.ferhat.advanced_auth_system.security.JwtTokenProvider;
 import org.ferhat.advanced_auth_system.service.email.EmailService;
+import org.ferhat.advanced_auth_system.service.google_authenticator.TwoFactorAuthServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,16 +40,18 @@ public class AuthServiceImpl implements AuthService{
     private final JwtTokenProvider jwtTokenProvider;
     private final IModelMapperService modelMapperService;
     private final EmailService emailService;
+    private final TwoFactorAuthServiceImpl twoFactorAuthService;
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
-    public AuthServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider, IModelMapperService modelMapperService, EmailService emailService) {
+    public AuthServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider, IModelMapperService modelMapperService, EmailService emailService, TwoFactorAuthServiceImpl twoFactorAuthService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.modelMapperService = modelMapperService;
         this.emailService = emailService;
+        this.twoFactorAuthService = twoFactorAuthService;
     }
 
     @Override
@@ -248,6 +252,26 @@ public class AuthServiceImpl implements AuthService{
 
         } catch (Exception e) {
             return ApiResponse.error(ApiMessage.TOKEN_REFRESH_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+    }
+
+    @Override
+    public ApiResponse<String> verify2FA(TwoFactorVerifyRequest request) {
+        boolean isValid = twoFactorAuthService.verifyCode(request.getUserId(), request.getCode());
+        if (isValid) {
+            return ApiResponse.success(null, HttpStatus.OK.value(), ApiMessage.TWO_FA_ENABLED);
+        } else {
+            return ApiResponse.error(ApiMessage.INVALID_TWO_FA_CODE, HttpStatus.BAD_REQUEST.value());
+        }
+    }
+
+    @Override
+    public ApiResponse<String> toggle2FA(Long userId, boolean enable) {
+        boolean success = enable ? twoFactorAuthService.enable2FA(userId) : twoFactorAuthService.disable2FA(userId);
+        if (success) {
+            return ApiResponse.success(null, HttpStatus.OK.value(), enable ? ApiMessage.TWO_FA_ENABLED : ApiMessage.TWO_FA_DISABLED);
+        } else {
+            return ApiResponse.error(ApiMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND.value());
         }
     }
 
